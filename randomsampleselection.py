@@ -2,21 +2,22 @@ import os
 import shutil
 import random
 
-
 # Set the source directory containing the images
-source_dir = input("Enter the path to the source directory: ")
-new_dataset_dir = input("Enter the desired path to the sample dataset directory: ")
-number_of_images = int(input("Enter the number of images to be sampled: "))
+source_dir = input("Enter the path to the source directory: ").strip()
+new_dataset_dir = input("Enter the desired path to the sample dataset directory: ").strip()
+number_of_images = int(input("Enter the number of images to be sampled per folder: ").strip())
+
+# Create the new dataset directory if it doesn't exist
 os.makedirs(new_dataset_dir, exist_ok=True)
 
-for folders in os.listdir(source_dir):
-    folder_path = os.path.join(source_dir, folders)
+for folder in os.listdir(source_dir):
+    folder_path = os.path.join(source_dir, folder)
     
+    # Check if the path is a directory
     if os.path.isdir(folder_path):
-        new_folder_path = os.path.join(new_dataset_dir, folders)
+        new_folder_path = os.path.join(new_dataset_dir, folder)
         os.makedirs(new_folder_path, exist_ok=True)
         
-        # Get a list of all image files in the source folder
         image_files = [f for f in os.listdir(folder_path) if f.endswith(('.jpg', '.jpeg', '.png'))]
         
         # Randomly select number of images wanted from the source folder
