@@ -27,7 +27,7 @@ def load_dataset():
     return X, y
             
 # define function 2: prepare dataset
-def prep_dataset(X,y):
+def processingds(X,y):
     testsize = float(input("Enter the test size (between 0 and 1): ").strip())
     
     # Convert lists to numpy arrays
@@ -59,4 +59,4 @@ def prep_dataset(X,y):
     # print(y_train.shape, y_train_ohe.shape, y_test.shape, y_test_ohe.shape)
     return X_train, X_test, y_train_ohe, y_test_ohe
 
-prep_dataset(*load_dataset())
+# processingds(*load_dataset())

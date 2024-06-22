@@ -2,13 +2,8 @@ import os
 import shutil
 import random
 
-# define function randomsampleselection
-def randomsampleselection():
-# Set the source directory containing the images
-    source_dir = input("Enter the path to the source directory: ").strip()
-    new_dataset_dir = input("Enter the desired path to the sample dataset directory: ").strip()
-    number_of_images = int(input("Enter the number of images to be sampled per folder: ").strip())
-
+# define function 
+def randomsampleselection(source_dir, new_dataset_dir, number_of_images):
     # Create the new dataset directory if it doesn't exist
     os.makedirs(new_dataset_dir, exist_ok=True)
 
@@ -34,5 +29,6 @@ def randomsampleselection():
                     print(f"Copied {image} to {new_folder_path}")
                 except IOError as e:
                     print(f"Could not copy {image}: {e}")
-                    
-randomsampleselection()
+
+    print("Random sample dataset created.")
+

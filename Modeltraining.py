@@ -10,18 +10,17 @@ clear_session()
 set_random_seed(42)
 np.random.seed(42)
 
-def trainmodel(X_train, y_train_ohe):
-    epoch = int(input("Enter the number of epochs: ").strip())
-
+def trainmodel(X_train, y_train_ohe, epochs):
     # Define the model
     model = Sequential()
     model.add(Input(shape=X_train.shape[1:]))
     model.add(Flatten())
-    model.add(Dense(y.max()+1, activation='softmax'))
+    model.add(Dense(y_train_ohe.shape[1], activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     model.summary()
 
-    history = model.fit(X_train, y_train_ohe, epochs = epoch, verbose=1)
+
+    return model
 
     # test
     # plt.figure(figsize=(8,4))
