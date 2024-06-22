@@ -27,7 +27,7 @@ def load_dataset():
     return X, y
             
 # define function 2: prepare dataset
-def processingds(X,y):
+def prep_dataset(X,y):
     testsize = float(input("Enter the test size (between 0 and 1): ").strip())
     
     # Convert lists to numpy arrays

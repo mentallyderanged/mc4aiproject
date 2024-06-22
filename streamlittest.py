@@ -6,8 +6,8 @@ import tensorflow as tf
 
 # Import functions from other files
 from randomsampleselection import randomsampleselection
-from readandprep import load_dataset, prep_dataset
-from modeltraining import trainmodel
+from Readandprep import load_dataset, prep_dataset
+from Modeltraining import trainmodel
 
 def main():
     st.title("Handwritten Digit Classification Web App")
