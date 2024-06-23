@@ -2,9 +2,9 @@ from PIL import Image
 import os
 import numpy as np
 from sklearn.model_selection import train_test_split
-import matplotlib.pyplot as plt
 import tensorflow as tf
 from tensorflow.keras.utils import to_categorical
+import cv2
 
 # def function 1
 def load_dataset(ds_path):
@@ -20,10 +20,12 @@ def load_dataset(ds_path):
             if f.endswith('.png'):
                 img = Image.open(os.path.join(ds_path, folder, f))
                 img = np.array(img)
+                if img.shape != (64, 64, 3):
+                    img = cv2.resize(img, (64, 64))
                 X.append(img)
                 y.append(label_mapping[folder])
                 y_label.append(folder)
-            
+    
     return X, y,y_label
             
 # define function 2
