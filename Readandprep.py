@@ -12,7 +12,7 @@ def load_dataset(ds_path):
     label_mapping = {folder: i for i, folder in enumerate(folders)}
     X, y = [], []
     y_label = []
-
+    maxsamplesize = 1000000
     # Read files in folder
     for folder in folders:
         files = os.listdir(os.path.join(ds_path, folder))
@@ -25,8 +25,11 @@ def load_dataset(ds_path):
                 X.append(img)
                 y.append(label_mapping[folder])
                 y_label.append(folder)
+        if len(folder) < maxsamplesize:
+            maxsamplesize = len(folder)
+            
     
-    return X, y,y_label
+    return X, y,y_label,maxsamplesize
             
 # define function 2
 def prep_dataset(X, y, testsize):

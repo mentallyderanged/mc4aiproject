@@ -52,10 +52,13 @@ if page == "Dataset Selection & Training":
     if st.button("Load, Preprocess & Train Model"):
         if dataset_path is not None:
             with st.spinner("Loading and Preprocessing Dataset..."):
-                X, y, y_label = load_dataset(dataset_path)
+                X, y, y_label,maxsamplesize = load_dataset(dataset_path)
                 if option == "Custom Dataset" and use_random_sample:
                     X, y = randomsampleselection(X, y, num_samples_per_class)
                 X_train, X_test, y_train_ohe, y_test_ohe = prep_dataset(X, y, test_size)
+                if maxsamplesize < num_samples_per_class:
+                    st.warning(f"The dataset exists a folder which contain less than {num_samples_per_class} sample. Using {maxsamplesize} samples or less per class instead.")
+                    st.stop()
 
             st.success("Dataset Loaded and Preprocessed!")
             st.write(f"Training Set Shape: {X_train.shape}")
