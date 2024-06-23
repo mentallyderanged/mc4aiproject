@@ -19,8 +19,6 @@ def trainmodel(X_train, y_train_ohe, epochs):
     model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
     model.summary()
 
-    history = model.fit(X_train, y_train_ohe, epochs=epochs, verbose=1)
-
     return model
 
     # test
