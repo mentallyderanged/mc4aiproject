@@ -18,6 +18,8 @@ page = st.sidebar.selectbox("Select a page", ["Dataset Selection & Training", "P
 # Initialize session state for the model
 if 'model' not in st.session_state:
     st.session_state.model = None
+if 'y_label' not in st.session_state:
+    st.session_state.y_label = None
 if page == "Dataset Selection & Training":
     st.title("Dataset Loader, Processor & Model Training")
 
@@ -43,7 +45,7 @@ if page == "Dataset Selection & Training":
     if st.button("Load, Preprocess & Train Model"):
         if dataset_path is not None:
             with st.spinner("Loading and Preprocessing Dataset..."):
-                X, y = load_dataset(dataset_path)
+                X, y, y_label = load_dataset(dataset_path)
                 if option == "Custom Dataset" and use_random_sample:
                     X, y = randomsampleselection(X, y, num_samples_per_class)
                 X_train, X_test, y_train_ohe, y_test_ohe = prep_dataset(X, y, test_size)
@@ -51,7 +53,8 @@ if page == "Dataset Selection & Training":
             st.success("Dataset Loaded and Preprocessed!")
             st.write(f"Training Set Shape: {X_train.shape}")
             st.write(f"Test Set Shape: {X_test.shape}")
-
+            st.session_state.y_label = y_label
+            
             with st.spinner(f"Training Model..."):
                 st.session_state.model = trainmodel(X_train, y_train_ohe, epochs)
                 history = st.session_state.model.fit(X_train, y_train_ohe, epochs = epochs, verbose=1)
@@ -65,8 +68,7 @@ if page == "Dataset Selection & Training":
             st.write(f"Accuracy: {accuracy:.4f}")
             st.write(np.unique(y))
             
-            plt.plot(history.history['accuracy'])
-            st.pyplot(plt)
+            st.line_chart(history.history['accuracy'], y_label = 'accuracy', x_label = 'epoch scaled')
 elif page == "Prediction":
     st.title("Make a Prediction")
     if st.session_state.model is not None:
@@ -105,10 +107,16 @@ elif page == "Prediction":
                 predicted_class = np.argmax(prediction)
 
                 # test labels 4 default alphabet ONLY! NEED TO CHANGE IF DIFFERENT DATASET IS USED!
-                labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+                #labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+                labels = np.unique(st.session_state.y_label)
                 predicted_label = labels[predicted_class]
 
-                st.write(f"Predicted Letter: {predicted_label}")
+                st.write(f"Predicted Letter: {predicted_label}  {prediction[0][predicted_class]*100:.2f}%")
+
+                # Get the top 5 predictions
+                top5_indices = np.argsort(prediction[0])[::-1][:5]
+                for i in top5_indices:
+                    st.write(f"{labels[i]}: {prediction[0][i] * 100:.2f}%")
                 
     else:
         st.write("Please train the model on the 'Dataset Selection & Training' page first.")

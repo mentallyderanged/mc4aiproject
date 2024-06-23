@@ -11,6 +11,7 @@ def load_dataset(ds_path):
     folders = os.listdir(ds_path)
     label_mapping = {folder: i for i, folder in enumerate(folders)}
     X, y = [], []
+    y_label = []
 
     # Read files in folder
     for folder in folders:
@@ -21,8 +22,9 @@ def load_dataset(ds_path):
                 img = np.array(img)
                 X.append(img)
                 y.append(label_mapping[folder])
+                y_label.append(folder)
             
-    return X, y
+    return X, y,y_label
             
 # define function 2
 def prep_dataset(X, y, testsize):
