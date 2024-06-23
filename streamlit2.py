@@ -61,6 +61,7 @@ if page == "Dataset Selection & Training":
             st.write("## Evaluation on Test Set:")
             st.write(f"Loss: {loss:.4f}")
             st.write(f"Accuracy: {accuracy:.4f}")
+            st.write(np.unique(y))
 elif page == "Prediction":
     st.title("Make a Prediction")
     if st.session_state.model is not None:
@@ -103,5 +104,6 @@ elif page == "Prediction":
                 predicted_label = labels[predicted_class]
 
                 st.write(f"Predicted Letter: {predicted_label}")
+                
     else:
         st.write("Please train the model on the 'Dataset Selection & Training' page first.")
