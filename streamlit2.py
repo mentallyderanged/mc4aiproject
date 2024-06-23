@@ -5,6 +5,7 @@ import numpy as np
 from PIL import Image
 import tensorflow as tf
 import cv2
+import matplotlib.pyplot as plt
 
 # Import functions from other files
 from randomsampleselection import randomsampleselection
@@ -36,7 +37,7 @@ if page == "Dataset Selection & Training":
             num_samples_per_class = st.number_input("Number of Samples per Class", min_value=1, value=500)
 
     # Model Training Parameters
-    epochs = st.number_input("Number of Training Epochs", min_value=1, value=100)
+    epochs = st.number_input("Number of Training Epochs", min_value=100, value=300)
 
     # Load, Preprocess, and Train
     if st.button("Load, Preprocess & Train Model"):
@@ -53,6 +54,7 @@ if page == "Dataset Selection & Training":
 
             with st.spinner(f"Training Model..."):
                 st.session_state.model = trainmodel(X_train, y_train_ohe, epochs)
+                history = st.session_state.model.fit(X_train, y_train_ohe, epochs = epochs, verbose=1)
 
             st.success("Model Trained!")
 
@@ -62,6 +64,9 @@ if page == "Dataset Selection & Training":
             st.write(f"Loss: {loss:.4f}")
             st.write(f"Accuracy: {accuracy:.4f}")
             st.write(np.unique(y))
+            
+            plt.plot(history.history['accuracy'])
+            st.pyplot(plt)
 elif page == "Prediction":
     st.title("Make a Prediction")
     if st.session_state.model is not None:
