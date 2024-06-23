@@ -13,7 +13,6 @@ from sklearn.preprocessing import MinMaxScaler
 from randomsampleselection import randomsampleselection
 from Readandprep import load_dataset, prep_dataset
 from Modeltraining import trainmodel
-
 # Page selection sidebar
 page = st.sidebar.selectbox("Select a page", ["Dataset Selection & Training", "Prediction"])
 
@@ -22,6 +21,8 @@ if 'model' not in st.session_state:
     st.session_state.model = None
 if 'y_label' not in st.session_state:
     st.session_state.y_label = None
+if 'flag' not in st.session_state:
+    st.session_state.flag = 0
 if page == "Dataset Selection & Training":
     st.title("Dataset Loader, Processor & Model Training")
 
@@ -29,72 +30,119 @@ if page == "Dataset Selection & Training":
     col1, col2, col3 = st.columns(3)
     with col1:
         # Dataset Selection
-        option = st.selectbox("Select Dataset Source:", ["Default dataset (Alphabet) - custom settings ", "Custom Dataset"])
-        dataset_path = "default_dataset" if option == "Default dataset (Alphabet) - custom settings " else None
+        option = st.selectbox("Select Dataset Source:", ["Default dataset (Alphabet) - pretrained model", "Default dataset (Alphabet) - custom settings ", "Custom Dataset"])
+        dataset_path = "default_dataset" if option == "Default dataset (Alphabet) - custom settings " or  option == "Default dataset (Alphabet) - pretrained model"  else None
         if option == "Custom Dataset":
             dataset_path = st.file_uploader("Upload Dataset (zip file)", type="zip")
-
+            st.session_state.flag = 1
+        else:
+            st.session_state.flag = 0
     with col2:
         # Data Preprocessing Parameters
-        test_size = st.number_input("Test Set Size (0.1 - 0.5)", min_value=0.1, max_value=0.5, value=0.2, step=0.1)
+        test_size = st.number_input("Test Set Size (0.1 - 0.5)", min_value=0.1, max_value=0.5, value=0.15, step=0.05)
 
     with col3:
         # Model Training Parameters
-        epochs = st.number_input("Number of Training Epochs", min_value=100, value=300)
+        if option == "Default dataset (Alphabet) - pretrained model":
+            epochs = st.number_input("Number of Training Epochs", min_value=100, value=100,disabled=True)
+        else:
+            epochs = st.number_input("Number of Training Epochs", min_value=100, value=100)
 
     # Random Sample Selection (Optional)
     if option == "Custom Dataset":
         use_random_sample = st.checkbox("Use Random Sample of Images", value=True)
         if use_random_sample:
-            num_samples_per_class = st.number_input("Number of Samples per Class", min_value=1, value=500)
+            num_samples_per_class = st.number_input("Number of Samples per Class", min_value=1, value=200)
+            
 
     # Load, Preprocess, and Train
-    if st.button("Load, Preprocess & Train Model"):
-        if dataset_path is not None:
-            with st.spinner("Loading and Preprocessing Dataset..."):
-                X, y, y_label,maxsamplesize = load_dataset(dataset_path)
-                if option == "Custom Dataset" and use_random_sample:
-                    X, y = randomsampleselection(X, y, num_samples_per_class)
-                X_train, X_test, y_train_ohe, y_test_ohe = prep_dataset(X, y, test_size)
-                if maxsamplesize < num_samples_per_class:
-                    st.warning(f"The dataset exists a folder which contain less than {num_samples_per_class} sample. Using {maxsamplesize} samples or less per class instead.")
-                    st.stop()
+    if option == "Default dataset (Alphabet) - pretrained model":
+        if st.button("Load, Preprocess & Evaluate Model"):
+            if dataset_path is not None:
+                with st.spinner("Loading and Preprocessing Dataset..."):
+                    X, y, y_label,maxsamplesize = load_dataset(dataset_path)
 
-            st.success("Dataset Loaded and Preprocessed!")
-            st.write(f"Training Set Shape: {X_train.shape}")
-            st.write(f"Test Set Shape: {X_test.shape}")
-            st.session_state.y_label = y_label
+                    X_train, X_test, y_train_ohe, y_test_ohe = prep_dataset(X, y, 0.2)
 
-            with st.spinner(f"Training Model..."):
-                st.session_state.model = trainmodel(X_train, y_train_ohe, epochs)
-                history = st.session_state.model.fit(X_train, y_train_ohe, epochs = epochs, verbose=1)
+                st.success("Dataset Loaded and Preprocessed!")
+                st.write(f"Training Set Shape: {X_train.shape}")
+                st.write(f"Test Set Shape: {X_test.shape}")
+                st.session_state.y_label = y_label
 
-            st.success("Model Trained!")
+                with st.spinner(f"Loading Model..."):
+                    st.session_state.model = tf.keras.models.load_model("pretrained_alphabet_model.h5")
 
-            # Evaluate the model on the test set
-            loss, accuracy = st.session_state.model.evaluate(X_test, y_test_ohe, verbose=0)
-            st.write("## Evaluation on Test Set:")
-            st.write(f"Loss: {loss:.4f}")
-            st.write(f"Accuracy: {accuracy:.4f}")
+                st.success("Model Loaded!")
 
-            fig = px.line(history.history, y=['accuracy', 'loss'], labels={'value': 'Metrics', 'index': 'Epoch'})
-            fig.update_layout(title='Training History', xaxis_title='Epoch', yaxis_title='Value')
-            st.plotly_chart(fig)
-            plt.close()
-            st.write("## Dataset preview:")
-            unique_labels = np.unique(y)
-            for label in unique_labels:
-                # Find indices of images belonging to the current label
-                indices = np.where(y == label)[0]
-                selected_indices = np.random.choice(indices, size=min(10, len(indices)), replace=False)
-                fig, axs = plt.subplots(1, 10, figsize=(10, 1))
-                for i, idx in enumerate(selected_indices):
-                    axs[i].imshow(X[idx], cmap='gray')
-                    axs[i].axis('off')
+                # Evaluate the model on the test set
+                loss, accuracy = st.session_state.model.evaluate(X_test, y_test_ohe, verbose=0)
+                st.write("## Evaluation on Test Set:")
+                st.write(f"Loss: {loss:.4f}")
+                st.write(f"Accuracy: {accuracy:.4f}")
 
-                # Display the figure using Streamlit
-                st.pyplot(fig)
-                plt.close(fig)  # Close the figure to prevent display issues in Streamlit
+                st.write("## Dataset preview:")
+                unique_labels = np.unique(y)
+                for label in unique_labels:
+                    # Find indices of images belonging to the current label
+                    indices = np.where(y == label)[0]
+                    selected_indices = np.random.choice(indices, size=min(10, len(indices)), replace=False)
+                    fig, axs = plt.subplots(1, 10, figsize=(10, 1))
+                    for i, idx in enumerate(selected_indices):
+                        axs[i].imshow(X[idx], cmap='gray')
+                        axs[i].axis('off')
+
+                    # Display the figure using Streamlit
+                    st.pyplot(fig)
+                    plt.close(fig)  # Close the figure to prevent display issues in Streamlit
+    elif option == "Default dataset (Alphabet) - custom settings " or option == "Custom Dataset":
+        if st.button("Load, Preprocess & Train Model",disabled=False if option == "Default dataset (Alphabet) - custom settings " or option == "Custom Dataset" else True):
+            if dataset_path is not None:
+                with st.spinner("Loading and Preprocessing Dataset..."):
+                    X, y, y_label,maxsamplesize = load_dataset(dataset_path)
+                    if option == "Custom Dataset" and use_random_sample:
+                        X, y = randomsampleselection(X, y, num_samples_per_class)
+                    X_train, X_test, y_train_ohe, y_test_ohe = prep_dataset(X, y, test_size)
+                    if st.session_state.flag == 1:
+                        if maxsamplesize < num_samples_per_class:
+                            st.warning(f"The dataset exists a folder which contain less than {num_samples_per_class} sample. Using {maxsamplesize}  samples or less per class instead.")
+                            st.stop()
+
+                st.success("Dataset Loaded and Preprocessed!")
+                st.write(f"Training Set Shape: {X_train.shape}")
+                st.write(f"Test Set Shape: {X_test.shape}")
+                st.session_state.y_label = y_label
+
+                with st.spinner(f"Training Model..."):
+                    st.session_state.model = trainmodel(X_train, y_train_ohe, epochs)
+                    history = st.session_state.model.fit(X_train, y_train_ohe, epochs = epochs, verbose=1)
+
+                st.success("Model Trained!")
+
+                # Evaluate the model on the test set
+                loss, accuracy = st.session_state.model.evaluate(X_test, y_test_ohe, verbose=0)
+                st.write("## Evaluation on Test Set:")
+                st.write(f"Loss: {loss:.4f}")
+                st.write(f"Accuracy: {accuracy:.4f}")
+
+                fig = px.line(history.history, y=['accuracy', 'loss'], labels={'value': 'Metrics', 'index': 'Epoch'})
+                fig.update_layout(title='Training History', xaxis_title='Epoch', yaxis_title='Value')
+                st.plotly_chart(fig)
+                plt.close()
+                st.write("## Dataset preview:")
+                unique_labels = np.unique(y)
+                for label in unique_labels:
+                    # Find indices of images belonging to the current label
+                    indices = np.where(y == label)[0]
+                    selected_indices = np.random.choice(indices, size=min(10, len(indices)), replace=False)
+                    fig, axs = plt.subplots(1, 10, figsize=(10, 1))
+                    for i, idx in enumerate(selected_indices):
+                        axs[i].imshow(X[idx], cmap='gray')
+                        axs[i].axis('off')
+
+                    # Display the figure using Streamlit
+                    st.pyplot(fig)
+                    plt.close(fig)  # Close the figure to prevent display issues in Streamlit
+
 
 elif page == "Prediction":
     st.title("Make a Prediction")
