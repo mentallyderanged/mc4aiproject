@@ -6,6 +6,8 @@ from PIL import Image
 import tensorflow as tf
 import cv2
 import matplotlib.pyplot as plt
+import plotly.express as px
+
 
 # Import functions from other files
 from randomsampleselection import randomsampleselection
@@ -66,9 +68,26 @@ if page == "Dataset Selection & Training":
             st.write("## Evaluation on Test Set:")
             st.write(f"Loss: {loss:.4f}")
             st.write(f"Accuracy: {accuracy:.4f}")
-            st.write(np.unique(y))
             
-            st.line_chart(history.history['accuracy'], y_label = 'accuracy', x_label = 'epoch scaled')
+            fig = px.line(history.history, y=['accuracy', 'loss'], labels={'value': 'Metrics', 'index': 'Epoch'})
+            fig.update_layout(title='Training History', xaxis_title='Epoch', yaxis_title='Value')
+            st.plotly_chart(fig)
+            plt.close() 
+            st.write("## Dataset preview:")
+            unique_labels = np.unique(y)
+            for label in unique_labels:
+                # Find indices of images belonging to the current label
+                indices = np.where(y == label)[0]
+                selected_indices = np.random.choice(indices, size=min(10, len(indices)), replace=False)
+                fig, axs = plt.subplots(1, 10, figsize=(10, 1))
+                for i, idx in enumerate(selected_indices):
+                    axs[i].imshow(X[idx], cmap='gray')
+                    axs[i].axis('off')
+
+                # Display the figure using Streamlit
+                st.pyplot(fig)
+                plt.close(fig)  # Close the figure to prevent display issues in Streamlit
+
 elif page == "Prediction":
     st.title("Make a Prediction")
     if st.session_state.model is not None:
