@@ -8,13 +8,15 @@ import cv2
 import matplotlib.pyplot as plt
 import plotly.express as px
 from sklearn.preprocessing import MinMaxScaler
-import tensorflow.keras.models #fixed here
+import tensorflow.keras.models
 from tensorflow.keras.layers import Dropout, BatchNormalization
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.optimizers import Adam
 from tensorflow.keras.regularizers import l1
 from tensorflow.keras.callbacks import ReduceLROnPlateau
+import os
+import zipfile
 
 # Import functions from other files
 from randomsampleselection import randomsampleselection
@@ -40,9 +42,15 @@ if page == "Dataset Selection & Training":
     with col1:
         # Dataset Selection
         option = st.selectbox("Select Dataset Source:", ["Default dataset (Alphabet) - pretrained model", "Default dataset (Alphabet) - custom settings ", "Custom Dataset"])
-        dataset_path = "default_dataset" if option == "Default dataset (Alphabet) - custom settings " or  option == "Default dataset (Alphabet) - pretrained model"  else None
+        temp_ds = "default_dataset" if option == "Default dataset (Alphabet) - custom settings " or  option == "Default dataset (Alphabet) - pretrained model"  else None
         if option == "Custom Dataset":
-            dataset_path = st.file_uploader("Upload Dataset (zip file)", type="zip")
+            temp_ds = st.file_uploader("Upload Dataset (zip file)", type="zip")
+            temp_ds_path = None
+            if temp_ds is not None:
+                with zipfile.ZipFile(temp_ds, 'r') as zip_ref:
+                    zip_ref.extractall("temp_dataset")
+                temp_ds_path = "temp_dataset"
+
             st.session_state.flag = 1
         else:
             st.session_state.flag = 0
@@ -54,17 +62,22 @@ if page == "Dataset Selection & Training":
     with col3:
         # Model Training Parameters
         if option == "Default dataset (Alphabet) - pretrained model":
-            epochs = st.number_input("Number of Training Epochs", min_value=100, value=100,disabled=True)
+            epochs = st.number_input("Number of Training Epochs", min_value=1, value=50,disabled=True)
             st.session_state.flag2 = 1
         else:
-            epochs = st.number_input("Number of Training Epochs", min_value=100, value=100)
+            epochs = st.number_input("Number of Training Epochs", min_value=1, value=50)
 
     # Random Sample Selection (Optional)
     if option == "Custom Dataset":
         use_random_sample = st.checkbox("Use Random Sample of Images", value=True)
         if use_random_sample:
-            num_samples_per_class = st.number_input("Number of Samples per Class", min_value=1, value=200)
+            num_samples_per_class = st.number_input("Number of Samples per Class", min_value=1, value=50)
 
+    dataset_path = None  # Initialize dataset_path
+    if option == "Default dataset (Alphabet) - pretrained model" or option == "Default dataset (Alphabet) - custom settings ":
+        dataset_path = "default_dataset"
+    elif option == "Custom Dataset" and temp_ds is not None:
+        dataset_path = temp_ds_path
 
     # Load, Preprocess, and Train
     if option == "Default dataset (Alphabet) - pretrained model":
@@ -81,7 +94,7 @@ if page == "Dataset Selection & Training":
                 st.session_state.y_label = y_label
 
                 with st.spinner(f"Loading Model..."):
-                    st.session_state.model = tensorflow.keras.models.load_model("trainedmodel test3_1.h5") #fixed here
+                    st.session_state.model = tensorflow.keras.models.load_model("trainedmodel test3_1.h5")
                     st.session_state.model.compile(optimizer=Adam(learning_rate=0.0001), loss='categorical_crossentropy', metrics=['accuracy'])
                 st.success("Model Loaded!")
 
@@ -109,9 +122,11 @@ if page == "Dataset Selection & Training":
         if st.button("Load, Preprocess & Train Model",disabled=False if option == "Default dataset (Alphabet) - custom settings " or option == "Custom Dataset" else True):
             if dataset_path is not None:
                 with st.spinner("Loading and Preprocessing Dataset..."):
-                    X, y, y_label,maxsamplesize = load_dataset(dataset_path)
-                    if option == "Custom Dataset" and use_random_sample:
-                        X, y = randomsampleselection(X, y, num_samples_per_class)
+                    if option == "Default dataset (Alphabet) - custom settings ":
+                        X, y, y_label,maxsamplesize = load_dataset(dataset_path)
+                    elif option == "Custom Dataset" and use_random_sample:
+                        randomsampleselection(dataset_path, 'temp_dataset_random', num_samples_per_class)
+                        X, y, y_label, maxsamplesize = load_dataset('temp_dataset_random')
                     X_train, X_test, y_train_ohe, y_test_ohe = prep_dataset(X, y, test_size)
                     if st.session_state.flag == 1:
                         if maxsamplesize < num_samples_per_class:
@@ -264,7 +279,8 @@ elif page == "Prediction":
                     top5_indices_inverted = np.argsort(prediction_inverted[0])[::-1][:5]
                     for i in top5_indices_inverted:
                         st.write(f"{labels[i]}: {prediction_inverted[0][i] * 100:.2f}%")
-            st.session_state.canvas.clear()
+            if 'canvas' in st.session_state:
+                st.session_state.canvas.clear()
 
     else:
         st.write("Please train the model on the 'Dataset Selection & Training' page first.")
