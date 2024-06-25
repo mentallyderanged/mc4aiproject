@@ -54,6 +54,9 @@ if page == "Dataset Selection & Training":
                 with zipfile.ZipFile(temp_ds, 'r') as zip_ref:
                     zip_ref.extractall("temp_dataset")
                 temp_ds_path = "temp_dataset"
+                for f in os.listdir(temp_ds_path):
+                    folder_path = os.path.join(temp_ds_path, f)
+                temp_ds_path = folder_path
 
             st.session_state.flag = 1
         else:
