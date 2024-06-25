@@ -1,3 +1,4 @@
+
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 import numpy as np
@@ -76,8 +77,8 @@ if page == "Dataset Selection & Training":
                 st.session_state.y_label = y_label
 
                 with st.spinner(f"Loading Model..."):
-                    st.session_state.model = tensorflow.keras.models.load_model("model.h5") #fixed here
-                    
+                    st.session_state.model = tensorflow.keras.models.load_model("trainedmodel test3_1.h5") #fixed here
+                    st.session_state.model.compile(optimizer=Adam(learning_rate=0.0001), loss='categorical_crossentropy', metrics=['accuracy'])
                 st.success("Model Loaded!")
 
                 # Evaluate the model on the test set
@@ -158,9 +159,11 @@ elif page == "Prediction":
         # Columns for canvas and image upload
         col1, col2 = st.columns([2,1])
 
+        #Brushstrokes size slider in sidebar
+        stroke_width = st.sidebar.slider("Brushstrokes Size", 1, 50, 30)
+
         with col1:
             # Streamlit canvas setup
-            stroke_width =  30
             stroke_color = "#eee"
             bg_color = "black"
             drawing_mode = st.sidebar.selectbox(

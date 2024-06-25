@@ -25,6 +25,7 @@ def trainmodel(X_train, y_train_ohe, epochs):
 
     return model
 
+
     # test
     # plt.figure(figsize=(8,4))
     # 
