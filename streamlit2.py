@@ -1,4 +1,3 @@
-
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 import numpy as np
@@ -60,10 +59,10 @@ if page == "Dataset Selection & Training":
                 temp_ds_path = folder_path
 
             st.session_state.flag = 1
-            st.session_state.flag2 = 0
+            #st.session_state.flag2 = 0
         else:
             st.session_state.flag = 0
-            st.session_state.flag2 = 1
+            #st.session_state.flag2 = 1
     with col2:
         # Data Preprocessing Parameters
         test_size = st.number_input("Test Set Size (0.1 - 0.5)", min_value=0.1, max_value=0.5, value=0.15, step=0.05)
@@ -72,10 +71,10 @@ if page == "Dataset Selection & Training":
         # Model Training Parameters
         if option == "Default dataset (Alphabet) - pretrained model":
             epochs = st.number_input("Number of Training Epochs", min_value=1, value=50,disabled=True)
-            st.session_state.flag2 = 1
+            #st.session_state.flag2 = 1
         else:
             epochs = st.number_input("Number of Training Epochs", min_value=1, value=5)
-            st.session_state.flag2 = 0
+            #st.session_state.flag2 = 0
 
     # Random Sample Selection (Optional) TOO MANY BUGS
     # if option == "Custom Dataset":
@@ -132,7 +131,7 @@ if page == "Dataset Selection & Training":
                 # Delete the "temp_dataset" folder after displaying the preview
                 if os.path.exists("temp_dataset"):
                     shutil.rmtree("temp_dataset")
-        st.session_state.flag2 = 1
+        #st.session_state.flag2 = 1
 
     elif option == "Default dataset (Alphabet) - custom settings " or option == "Custom Dataset":
         if st.button("Load, Preprocess & Train Model",disabled=False if option == "Default dataset (Alphabet) - custom settings " or (option == "Custom Dataset" and temp_ds is not None) else True):
