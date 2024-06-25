@@ -249,9 +249,9 @@ elif page == "Prediction":
                 labels = np.unique(st.session_state.y_label)
                 st.write(predicted_class)
                 predicted_label = labels[predicted_class]
-                st.write("Length of labels:", len(labels))
-                st.write("Shape of prediction:", np.shape(prediction))
-                st.write("Length of prediction[0]:", len(prediction[0]))
+                # st.write("Length of labels:", len(labels))
+                # st.write("Shape of prediction:", np.shape(prediction))
+                # st.write("Length of prediction[0]:", len(prediction[0]))
 
 
                 st.image(img_gray.reshape(64, 64), caption='Processed Input Image', use_column_width=False, clamp=True)
