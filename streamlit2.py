@@ -30,6 +30,8 @@ if 'y_label' not in st.session_state:
     st.session_state.y_label = None
 if 'flag' not in st.session_state:
     st.session_state.flag = 0
+if 'flag2' not in st.session_state:
+    st.session_state.flag2 = 0
 if page == "Dataset Selection & Training":
     st.title("Dataset Loader, Processor & Model Training")
 
@@ -44,6 +46,7 @@ if page == "Dataset Selection & Training":
             st.session_state.flag = 1
         else:
             st.session_state.flag = 0
+            st.session_state.flag2 = 1
     with col2:
         # Data Preprocessing Parameters
         test_size = st.number_input("Test Set Size (0.1 - 0.5)", min_value=0.1, max_value=0.5, value=0.15, step=0.05)
@@ -52,6 +55,7 @@ if page == "Dataset Selection & Training":
         # Model Training Parameters
         if option == "Default dataset (Alphabet) - pretrained model":
             epochs = st.number_input("Number of Training Epochs", min_value=100, value=100,disabled=True)
+            st.session_state.flag2 = 1
         else:
             epochs = st.number_input("Number of Training Epochs", min_value=100, value=100)
 
@@ -189,7 +193,8 @@ elif page == "Prediction":
 
             if canvas_result.image_data is not None:
                 img = canvas_result.image_data
-
+                if st.session_state.flag2 == 1:
+                    img = cv2.resize(img, (32, 32))
                 # Preprocess the input image
                 img = cv2.resize(img, (64, 64))
                 img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
