@@ -161,9 +161,16 @@ if page == "Dataset Selection & Training":
                 st.write("## Evaluation on Test Set:")
                 st.write(f"Loss: {loss:.4f}")
                 st.write(f"Accuracy: {accuracy:.4f}")
+                #test 1
                 st.write(np.unique(y))
                 st.write(np.unique(st.session_state.y_label))
-
+                st.write('y_train_ohe.shape',y_train_ohe.shape)
+                st.write('max(y)',max(y))
+                st.write(min(y))
+                st.write('np.unique(y_train_ohe)',np.unique(y_train_ohe))
+                st.write(len(np.unique(y)))
+                st.write(len(np.unique(y_label)))
+                
 
                 fig = px.line(history.history, y=['accuracy', 'loss'], labels={'value': 'Metrics', 'index': 'Epoch'})
                 fig.update_layout(title='Training History', xaxis_title='Epoch', yaxis_title='Value')
@@ -244,6 +251,7 @@ elif page == "Prediction":
                 st.write("Length of labels:", len(labels))
                 st.write("Shape of prediction:", np.shape(prediction))
                 st.write("Length of prediction[0]:", len(prediction[0]))
+
 
                 st.image(img_gray.reshape(64, 64), caption='Processed Input Image', use_column_width=False, clamp=True)
                 st.write(f"Predicted Letter: {predicted_label}  {prediction[0][predicted_class]*100:.2f}%")

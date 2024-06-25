@@ -20,8 +20,10 @@ def load_dataset(ds_path):
             if f.endswith('.png'):
                 img = Image.open(os.path.join(ds_path, folder, f))
                 img = np.array(img)
-                if img.shape != (64, 64, 3):
+                if img.shape != (64, 64):
                     img = cv2.resize(img, (64, 64))
+                    if img.shape != (64, 64):
+                        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
                 X.append(img)
                 y.append(label_mapping[folder])
                 y_label.append(folder)
@@ -43,7 +45,7 @@ def prep_dataset(X, y, testsize):
     X_train = X_train / 255.0
     X_test = X_test / 255.0
 
-    y_train_ohe = to_categorical(y_train, num_classes=y.max() + 1)
-    y_test_ohe = to_categorical(y_test, num_classes=y.max() + 1)
+    y_train_ohe = to_categorical(y_train, num_classes=y.max()+1)
+    y_test_ohe = to_categorical(y_test, num_classes=y.max()+1)
 
     return X_train, X_test, y_train_ohe, y_test_ohe
