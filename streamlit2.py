@@ -1,4 +1,3 @@
-
 import streamlit as st
 from streamlit_drawable_canvas import st_canvas
 import numpy as np
@@ -8,6 +7,13 @@ import cv2
 import matplotlib.pyplot as plt
 import plotly.express as px
 from sklearn.preprocessing import MinMaxScaler
+import tensorflow.keras.models #fixed here
+from tensorflow.keras.layers import Dropout, BatchNormalization
+from tensorflow.keras.regularizers import l2
+from tensorflow.keras.callbacks import EarlyStopping
+from tensorflow.keras.optimizers import Adam
+from tensorflow.keras.regularizers import l1
+from tensorflow.keras.callbacks import ReduceLROnPlateau
 
 # Import functions from other files
 from randomsampleselection import randomsampleselection
@@ -53,7 +59,7 @@ if page == "Dataset Selection & Training":
         use_random_sample = st.checkbox("Use Random Sample of Images", value=True)
         if use_random_sample:
             num_samples_per_class = st.number_input("Number of Samples per Class", min_value=1, value=200)
-            
+
 
     # Load, Preprocess, and Train
     if option == "Default dataset (Alphabet) - pretrained model":
@@ -70,8 +76,8 @@ if page == "Dataset Selection & Training":
                 st.session_state.y_label = y_label
 
                 with st.spinner(f"Loading Model..."):
-                    st.session_state.model = tf.keras.models.load_model("pretrained_alphabet_model.h5")
-
+                    st.session_state.model = tensorflow.keras.models.load_model("model.h5") #fixed here
+                    
                 st.success("Model Loaded!")
 
                 # Evaluate the model on the test set
