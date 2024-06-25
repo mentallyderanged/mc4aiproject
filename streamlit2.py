@@ -60,6 +60,7 @@ if page == "Dataset Selection & Training":
                 temp_ds_path = folder_path
 
             st.session_state.flag = 1
+            st.session_state.flag2 = 0
         else:
             st.session_state.flag = 0
             st.session_state.flag2 = 1
@@ -73,7 +74,8 @@ if page == "Dataset Selection & Training":
             epochs = st.number_input("Number of Training Epochs", min_value=1, value=50,disabled=True)
             st.session_state.flag2 = 1
         else:
-            epochs = st.number_input("Number of Training Epochs", min_value=1, value=50)
+            epochs = st.number_input("Number of Training Epochs", min_value=1, value=5)
+            st.session_state.flag2 = 0
 
     # Random Sample Selection (Optional) TOO MANY BUGS
     # if option == "Custom Dataset":
@@ -130,6 +132,7 @@ if page == "Dataset Selection & Training":
                 # Delete the "temp_dataset" folder after displaying the preview
                 if os.path.exists("temp_dataset"):
                     shutil.rmtree("temp_dataset")
+        st.session_state.flag2 = 1
 
     elif option == "Default dataset (Alphabet) - custom settings " or option == "Custom Dataset":
         if st.button("Load, Preprocess & Train Model",disabled=False if option == "Default dataset (Alphabet) - custom settings " or (option == "Custom Dataset" and temp_ds is not None) else True):
@@ -162,15 +165,10 @@ if page == "Dataset Selection & Training":
                 st.write(f"Loss: {loss:.4f}")
                 st.write(f"Accuracy: {accuracy:.4f}")
                 #test 1
-                st.write(np.unique(y))
-                st.write(np.unique(st.session_state.y_label))
-                st.write('y_train_ohe.shape',y_train_ohe.shape)
-                st.write('max(y)',max(y))
-                st.write(min(y))
-                st.write('np.unique(y_train_ohe)',np.unique(y_train_ohe))
-                st.write(len(np.unique(y)))
-                st.write(len(np.unique(y_label)))
-                
+                # st.write('length of unique y labels:',len(np.un(st.session_state.# y_label)))
+                # st.write('y_train_ohe.shape:',y_train_ohe.shape)
+                # st.write('length of unique y labels:',len(np.un(y_label)))
+
 
                 fig = px.line(history.history, y=['accuracy', 'loss'], labels={'value': 'Metrics', 'index': 'Epoch'})
                 fig.update_layout(title='Training History', xaxis_title='Epoch', yaxis_title='Value')
@@ -194,6 +192,10 @@ if page == "Dataset Selection & Training":
                 # Delete the "temp_dataset" folder after displaying the preview
                 if os.path.exists("temp_dataset"):
                     shutil.rmtree("temp_dataset")
+    if option == "Default dataset (Alphabet) - default settings" or  option == "Default dataset (Alphabet) - custom settings ":
+        st.session_state.flag2 = 1
+    else:
+        st.session_state.flag2 = 0
 
 elif page == "Prediction":
     st.title("Make a Prediction")
