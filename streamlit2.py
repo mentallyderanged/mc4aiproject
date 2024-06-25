@@ -17,6 +17,7 @@ from tensorflow.keras.regularizers import l1
 from tensorflow.keras.callbacks import ReduceLROnPlateau
 import os
 import zipfile
+import shutil  # Add shutil for deleting folders
 
 # Import functions from other files
 #from randomsampleselection import randomsampleselection
@@ -125,6 +126,11 @@ if page == "Dataset Selection & Training":
                     # Display the figure using Streamlit
                     st.pyplot(fig)
                     plt.close(fig)  # Close the figure to prevent display issues in Streamlit
+
+                # Delete the "temp_dataset" folder after displaying the preview
+                if os.path.exists("temp_dataset"):
+                    shutil.rmtree("temp_dataset")
+
     elif option == "Default dataset (Alphabet) - custom settings " or option == "Custom Dataset":
         if st.button("Load, Preprocess & Train Model",disabled=False if option == "Default dataset (Alphabet) - custom settings " or (option == "Custom Dataset" and temp_ds is not None) else True):
             if dataset_path is not None:
@@ -155,6 +161,9 @@ if page == "Dataset Selection & Training":
                 st.write("## Evaluation on Test Set:")
                 st.write(f"Loss: {loss:.4f}")
                 st.write(f"Accuracy: {accuracy:.4f}")
+                st.write(np.unique(y))
+                st.write(np.unique(st.session_state.y_label))
+
 
                 fig = px.line(history.history, y=['accuracy', 'loss'], labels={'value': 'Metrics', 'index': 'Epoch'})
                 fig.update_layout(title='Training History', xaxis_title='Epoch', yaxis_title='Value')
@@ -175,6 +184,9 @@ if page == "Dataset Selection & Training":
                     st.pyplot(fig)
                     plt.close(fig)  # Close the figure to prevent display issues in Streamlit
 
+                # Delete the "temp_dataset" folder after displaying the preview
+                if os.path.exists("temp_dataset"):
+                    shutil.rmtree("temp_dataset")
 
 elif page == "Prediction":
     st.title("Make a Prediction")
@@ -227,7 +239,11 @@ elif page == "Prediction":
                 predicted_class = np.argmax(prediction)
 
                 labels = np.unique(st.session_state.y_label)
+                st.write(predicted_class)
                 predicted_label = labels[predicted_class]
+                st.write("Length of labels:", len(labels))
+                st.write("Shape of prediction:", np.shape(prediction))
+                st.write("Length of prediction[0]:", len(prediction[0]))
 
                 st.image(img_gray.reshape(64, 64), caption='Processed Input Image', use_column_width=False, clamp=True)
                 st.write(f"Predicted Letter: {predicted_label}  {prediction[0][predicted_class]*100:.2f}%")
@@ -257,6 +273,7 @@ elif page == "Prediction":
                 prediction = st.session_state.model.predict(img_gray)
                 predicted_class = np.argmax(prediction)
                 labels = np.unique(st.session_state.y_label)
+                st.write(predicted_class)
                 predicted_label = labels[predicted_class]
 
                 col3, col4 = st.columns(2)
