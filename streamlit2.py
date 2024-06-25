@@ -19,7 +19,7 @@ import os
 import zipfile
 
 # Import functions from other files
-from randomsampleselection import randomsampleselection
+#from randomsampleselection import randomsampleselection
 from Readandprep import load_dataset, prep_dataset
 from Modeltraining import trainmodel
 # Page selection sidebar
@@ -34,6 +34,9 @@ if 'flag' not in st.session_state:
     st.session_state.flag = 0
 if 'flag2' not in st.session_state:
     st.session_state.flag2 = 0
+if 'maxsamplesize' not in st.session_state:
+    st.session_state.maxsamplesize = 0
+
 if page == "Dataset Selection & Training":
     st.title("Dataset Loader, Processor & Model Training")
 
@@ -119,14 +122,13 @@ if page == "Dataset Selection & Training":
                     st.pyplot(fig)
                     plt.close(fig)  # Close the figure to prevent display issues in Streamlit
     elif option == "Default dataset (Alphabet) - custom settings " or option == "Custom Dataset":
-        if st.button("Load, Preprocess & Train Model",disabled=False if option == "Default dataset (Alphabet) - custom settings " or option == "Custom Dataset" else True):
+        if st.button("Load, Preprocess & Train Model",disabled=False if option == "Default dataset (Alphabet) - custom settings " or (option == "Custom Dataset" and temp_ds is not None) else True):
             if dataset_path is not None:
                 with st.spinner("Loading and Preprocessing Dataset..."):
-                    if option == "Default dataset (Alphabet) - custom settings ":
-                        X, y, y_label,maxsamplesize = load_dataset(dataset_path)
-                    elif option == "Custom Dataset" and use_random_sample:
-                        randomsampleselection(dataset_path, 'temp_dataset_random', num_samples_per_class)
-                        X, y, y_label, maxsamplesize = load_dataset('temp_dataset_random')
+                    X, y, y_label,maxsamplesize = load_dataset(dataset_path)
+                    #if option == "Custom Dataset" and use_random_sample:
+                        #randomsampleselection(dataset_path, 'temp_dataset_random', num_samples_per_class)
+                        #X, y, y_label, maxsamplesize = load_dataset('temp_dataset_random')
                     X_train, X_test, y_train_ohe, y_test_ohe = prep_dataset(X, y, test_size)
                     if st.session_state.flag == 1:
                         if maxsamplesize < num_samples_per_class:
