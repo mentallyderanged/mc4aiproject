@@ -24,7 +24,8 @@ def trainmodel(X_train, y_train_ohe, epochs):
     model = Sequential()
     model.add(Input(shape=X_train.shape[1:]))
   
-    model.add(Dense(64, activation='relu', kernel_regularizer=l1(0.001)))
+    #model.add(Dense(64, activation='relu', kernel_regularizer=l1(0.001)))
+    model.add(Dense(64, activation='relu'))
     model.add(BatchNormalization())
     #model.add(Dropout(0.2))
 
