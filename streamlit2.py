@@ -46,6 +46,13 @@ if page == "Dataset Selection & Training":
     with col1:
         # Dataset Selection
         option = st.selectbox("Select Dataset Source:", ["Default dataset (Alphabet) - pretrained model", "Default dataset (Alphabet) - custom settings ", "Custom Dataset"])
+        if option == "Default dataset (Alphabet) - default settings":
+            st.session_state.flag2 = 1
+        elif option == "Default dataset (Alphabet) - custom settings ":
+            st.session_state.flag2 = 1
+        else:
+            st.session_state.flag2 = 0
+
         temp_ds = "default_dataset" if option == "Default dataset (Alphabet) - custom settings " or  option == "Default dataset (Alphabet) - pretrained model"  else None
         if option == "Custom Dataset":
             temp_ds = st.file_uploader("Upload Dataset (zip file)", type="zip")
@@ -71,10 +78,9 @@ if page == "Dataset Selection & Training":
         # Model Training Parameters
         if option == "Default dataset (Alphabet) - pretrained model":
             epochs = st.number_input("Number of Training Epochs", min_value=1, value=50,disabled=True)
-            #st.session_state.flag2 = 1
+            st.session_state.flag2 = 1
         else:
             epochs = st.number_input("Number of Training Epochs", min_value=1, value=5)
-            #st.session_state.flag2 = 0
 
     # Random Sample Selection (Optional) TOO MANY BUGS
     # if option == "Custom Dataset":
@@ -131,7 +137,7 @@ if page == "Dataset Selection & Training":
                 # Delete the "temp_dataset" folder after displaying the preview
                 if os.path.exists("temp_dataset"):
                     shutil.rmtree("temp_dataset")
-        #st.session_state.flag2 = 1
+        st.session_state.flag2 = 1
 
     elif option == "Default dataset (Alphabet) - custom settings " or option == "Custom Dataset":
         if st.button("Load, Preprocess & Train Model",disabled=False if option == "Default dataset (Alphabet) - custom settings " or (option == "Custom Dataset" and temp_ds is not None) else True):
@@ -191,10 +197,6 @@ if page == "Dataset Selection & Training":
                 # Delete the "temp_dataset" folder after displaying the preview
                 if os.path.exists("temp_dataset"):
                     shutil.rmtree("temp_dataset")
-    if option == "Default dataset (Alphabet) - default settings" or  option == "Default dataset (Alphabet) - custom settings ":
-        st.session_state.flag2 = 1
-    else:
-        st.session_state.flag2 = 0
 
 elif page == "Prediction":
     st.title("Make a Prediction")
@@ -205,7 +207,7 @@ elif page == "Prediction":
         col1, col2 = st.columns([2,1])
 
         #Brushstrokes size slider in sidebar
-        stroke_width = st.sidebar.slider("Brushstrokes Size", 1, 50, 30)
+        stroke_width = st.sidebar.slider("Brushstrokes Size", 1, 30, 10)
 
         with col1:
             # Streamlit canvas setup
@@ -249,6 +251,7 @@ elif page == "Prediction":
                 labels = np.unique(st.session_state.y_label)
                 st.write(predicted_class)
                 predicted_label = labels[predicted_class]
+                st.write(st.session_state.flag2)
                 # st.write("Length of labels:", len(labels))
                 # st.write("Shape of prediction:", np.shape(prediction))
                 # st.write("Length of prediction[0]:", len(prediction[0]))

@@ -33,7 +33,7 @@ def trainmodel(X_train, y_train_ohe, epochs):
     model.add(Dense(y_train_ohe.shape[1], activation='softmax'))
 
     # Optimized Adam optimizer and compilation
-    optimizer = Adam(learning_rate=0.0001)  # Adjusted learning rate
+    optimizer = Adam(learning_rate=0.0001) 
     model.compile(loss='categorical_crossentropy',
                   optimizer=optimizer,
                   metrics=['accuracy'])
