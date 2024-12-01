@@ -1,8 +1,14 @@
-# mc4aiproject / Handwriting Recognition Project
-A fun little project I created! 🎉 >.< :3
-Custom language support! 🖋️ (But make sure the dataset follows the structure below)
-Dataset Structure hierarchy:
+# Handwriting Recognition Project 🖋️
 
+A fun little project I created! 🎉 >.< :3
+
+## Custom Language Support 📝
+
+**Important:** Make sure your dataset follows the specified structure!
+
+### Dataset Structure Hierarchy
+
+```
 dataset_folder/
 │
 ├── A/
@@ -19,5 +25,10 @@ dataset_folder/
     ├── image1.png
     ├── image2.png
     └── ...
-Each folder inside dataset_folder represents a single letter or character.
-Place all images corresponding to a character inside its folder (e.g., images of the letter "A" go inside the A folder).
+```
+
+### Guidelines
+
+- Each folder inside `dataset_folder` represents a single letter or character
+- Place all images corresponding to a specific character inside its respective folder
+- For example, images of the letter "A" should be placed inside the A folder
