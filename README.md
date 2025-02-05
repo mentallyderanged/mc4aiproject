@@ -1,6 +1,6 @@
 # Handwriting Recognition Project 🖋️
 
-A fun little project I created! 🎉 >.< :3
+A fun little project I created! 🎉 >.< :3 in like a few days (didnt spend a lot of time on it so its kinda low effort >.< oopsie)
 
 ## Custom Language Support 📝
 
